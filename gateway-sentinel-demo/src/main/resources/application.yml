@@ -1,0 +1,68 @@
+server:
+  port: 8888
+
+#【Route维度限流】
+#spring:
+#  application:
+#    name: gateway-sentinel-demo
+#  cloud:
+#    nacos:
+#      discovery:
+#        server-addr: 127.0.0.1:8848
+#    gateway:
+#      discovery:
+#        locator:
+#          enabled: false
+#          lower-case-service-id: false
+#      routes:
+#        - id: gateway-nacos-provider
+#          uri: lb://gateway-nacos-provider
+#          predicates:
+#            - Path=/sentinel/**
+#          filters:
+#            - StripPrefix=1
+
+#【自定义API分组限流】
+#spring:
+#  cloud:
+#    gateway:
+#      routes:
+#        - id: foo_route
+#          uri: http://localhost:8080
+#          predicates:
+#            - Path=/foo/** #被限流
+#          filters:
+#            - StripPrefix=1
+#        - id: baz_route
+#          uri: http://localhost:8080
+#          predicates:
+#            - Path=/baz/** #被限流
+#          filters:
+#            - StripPrefix=1
+#        - id: aaa_route
+#          uri: http://localhost:8080
+#          predicates:
+#            - Path=/aaa/** #不被限流
+#          filters:
+#            - StripPrefix=1
+
+#【自定义异常】
+spring:
+  application:
+    name: gateway-sentinel-demo
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
+    gateway:
+      discovery:
+        locator:
+          enabled: false
+          lower-case-service-id: false
+      routes:
+        - id: gateway-nacos-provider
+          uri: lb://gateway-nacos-provider
+          predicates:
+            - Path=/sentinel/**
+          filters:
+            - StripPrefix=1

@@ -1,0 +1,167 @@
+server:
+  port: 8088
+
+#【指定时间规则匹配路由】
+#在2022-01-01 00:00:00之前访问的请求，都会转到http://localhost:8080，即：http://localhost:8088/say会转发到http://localhost:8080/say
+#spring:
+#  cloud:
+#    gateway:
+#      routes:
+#        - id: before_route
+#          uri: http://localhost:8080
+#          predicates:
+#            - Before=2022-01-01T00:00:00.000+08:00
+
+#【指定时间规则匹配路由】
+#在2021-01-01 00:00:00之后访问的请求，都会转到http://localhost:8080，即：http://localhost:8088/say会转发到http://localhost:8080/say
+#spring:
+#  cloud:
+#    gateway:
+#      routes:
+#        - id: after_route
+#          uri: http://localhost:8080
+#          predicates:
+#            - After=2021-01-01T00:00:00.000+08:00
+
+#【指定Cookie规则匹配路由】
+#请求配置localhost的Cookie(chocolate=mic;) 请求http://localhost:8088/say会转发到http://localhost:8080/say
+#spring:
+#  cloud:
+#    gateway:
+#      routes:
+#        - id: cookie_route
+#          uri: http://localhost:8080
+#          predicates:
+#            - Cookie=chocolate, mic
+
+#【指定Header规则匹配路由】
+#请求配置Header(key=X-Request-Id value=1) 请求http://localhost:8088/say会转发到http://localhost:8080/say
+#spring:
+#  cloud:
+#    gateway:
+#      routes:
+#        - id: header_route
+#          uri: http://localhost:8080
+#          predicates:
+#            - Header=X-Request-Id, \d+
+
+#【指定Host规则匹配路由】
+#请求配置Header(Host:www.muse.com) 请求http://localhost:8088/say会转发到http://localhost:8080/say
+#spring:
+#  cloud:
+#    gateway:
+#      routes:
+#        - id: host_route
+#          uri: http://localhost:8080
+#          predicates:
+#            - Host=**.muse.com
+
+#【请求方法匹配路由】
+# 请求POST http://localhost:8088/shout会转发http://localhost:8080/shout。请求GET http://localhost:8088/say 会报"404 Not Found"
+#spring:
+#  cloud:
+#    gateway:
+#      routes:
+#        - id: method_route
+#          uri: http://localhost:8080 #访问地址
+#          predicates:
+#            - Method=POST
+
+#【请求路径匹配路由】
+# 请求POST http://localhost:8088/gateway/say会转发http://localhost:8080/say。
+#spring:
+#  cloud:
+#    gateway:
+#      routes:
+#        - id: path_routeHeaderRoutePredicateFactory
+#          uri: http://localhost:8080 #访问地址
+#          predicates:
+#            - Path=/gateway/** #路径匹配
+#          filters:
+#            - StripPrefix=1 #跳过前缀
+
+#【添加request查询参数过滤器】
+#会对所有请求增加teacher=muse这个参数
+#spring:
+#  cloud:
+#    gateway:
+#      routes:
+#        - id: add_request_parameter_route
+#          uri: http://localhost:8080 #访问地址
+#          predicates:
+#            - Path=/**
+#          filters:
+#            - AddRequestParameter=teacher, muse
+
+#【添加response响应Header参数过滤器】
+#返回结果给客户端之前，在Header中添加相应的数据
+#spring:
+#  cloud:
+#    gateway:
+#      routes:
+#        - id: add_response_header_route
+#          uri: http://localhost:8080 #访问地址
+#          predicates:
+#            - Path=/**
+#          filters:
+#            - AddResponseHeader=X-Response-Teacher, Muse
+
+#【添加限流过滤器】
+#spring:
+#  cloud:
+#    gateway:
+#      routes:
+#        - id: request_ratelimiter_route
+#          uri: http://localhost:8080 #访问地址
+#          predicates:
+#            - Path=/**
+#          filters:
+#            - name: RequestRateLimiter
+#              args:
+#                redis-rate-limiter.replenishRate: 1 #令牌桶中令牌的填充速度，代表允许每秒执行的请求数
+#                redis-rate-limiter.burstCapacity: 1 #令牌桶的容量，也就是令牌桶最多能够容纳的令牌数。表示每秒用户最大能够执行的请求数量
+redis:
+  host: 127.0.0.1
+  port: 6379
+
+#【添加请求重试过滤器】
+#spring:
+#  cloud:
+#    gateway:
+#      routes:
+#        - id: retry_route
+#          uri: http://localhost:8080
+#          predicates:
+#            - Path=/example/**
+#          filters:
+#            - name: Retry
+#              args:
+#                retries: 3 #请求重试次数，默认值是3
+#                status: 500 #HTTP请求返回的状态码，针对指定状态码进行重试。
+#            - StripPrefix=1
+
+
+#【网关指标过滤器——GatewayMetricsFilter】
+#management:
+#  endpoint:
+#    gateway:
+#      enabled: true
+#  endpoints:
+#    web:
+#      exposure:
+#        include: "*"
+
+#【请求路径匹配路由——配置自定义过滤器】
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: define_filter
+          uri: http://localhost:8080 #访问地址
+          predicates:
+            - Path=/gateway/** #路径匹配
+          filters:
+            - name: GpDefine #自定义过滤器的名字，即：GpDefineGatewayFilterFactory
+              args:
+                name: Gp_Mic #GpConfig.getName这个值
+            - StripPrefix=1 #跳过前缀
